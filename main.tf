@@ -10,8 +10,8 @@ data "vault_generic_secret" "kv-azuredb" {
 
 # Create Resource Group
 resource "azurerm_resource_group" "tinfoil" {
-    name        = "${var.resource_group}"
-    location    = "${var.location}"
+    name        = var.resource_group
+    location    = var.location
     tags = {
         Resource = "Group"
     }
@@ -19,12 +19,12 @@ resource "azurerm_resource_group" "tinfoil" {
 
 #--Create Database Servers
 resource "azurerm_sql_server" "tinfoil" {
-    name                         = "${var.sql_database_server}"
-    resource_group_name          = "${var.resource_group}"
-    location                     = "${var.location}"
+    name                         = var.sql_database_server
+    resource_group_name          = var.resource_group
+    location                     = var.location
     version                      = "12.0"
-    administrator_login          = "${data.vault_generic_secret.kv-azuredb.data["username"]}"
-    administrator_login_password = "${data.vault_generic_secret.kv-azuredb.data["password"]}"
+    administrator_login          = data.vault_generic_secret.kv-azuredb.data["username"]
+    administrator_login_password = data.vault_generic_secret.kv-azuredb.data["password"]
     tags = {
         Resource = "Database"
     }
@@ -32,11 +32,11 @@ resource "azurerm_sql_server" "tinfoil" {
 
 #--Create SQL Databases
 resource "azurerm_sql_database" "tinfoil" {
-    name                  = "${var.sql_databases[count.index]}"
-    count                 = "${length(var.sql_databases)}"
-    resource_group_name   = "${var.resource_group}"
-    location              = "${var.location}"
-    server_name           = "${var.sql_database_server}"
+    name                  = var.sql_databases[count.index]
+    count                 = length(var.sql_databases)
+    resource_group_name   = var.resource_group
+    location              = var.location
+    server_name           = var.sql_database_server
     tags = {
         Resource = "Database"
     }
